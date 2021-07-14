@@ -23,8 +23,8 @@ class AuctionListing(models.Model):
     description = TextField()
     category = models.ForeignKey(Category, on_delete=models.PROTECT, blank=True, related_name="listings")
     image = URLField(blank=True)
-    starting_bid_value = DecimalField(decimal_places=2)
-    winner = models.ForeignKey(User, on_delete=models.CASCADE ,related_name="wins")
+    starting_bid_value = DecimalField(max_digits=6, decimal_places=2)
+    winner = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True, editable=False, related_name="wins")
     is_active = BooleanField(default=True)
     users_in_watchlist = models.ManyToManyField(User, blank=True, related_name="watchlist")
 
@@ -35,7 +35,7 @@ class AuctionListing(models.Model):
 class Bid(models.Model):
     #TODO: ver qué pasa si elimino el usuario, quién gana la subasta
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="bids")
-    value = DecimalField(decimal_places=2)
+    value = DecimalField(max_digits=6, decimal_places=2)
     listing = models.ForeignKey(AuctionListing, on_delete=models.CASCADE, related_name="bids")
 
     def __str__(self) -> str:
