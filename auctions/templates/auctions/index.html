@@ -5,12 +5,15 @@
 
     <ul>
         {% for listing in auction_listings %}
-            <li>{{ listing.title }}
+            <li><a href="{% url 'listing' listing.pk %}">{{ listing.title }}</a>
                 <ul>
                     <li>{{ listing.timestamp }} </li>
                     <li>{{ listing.description }} </li>
                     <li><img src="{{ listing.image_url }}" alt="{{ listing.title }}" width="300"></li>
                     <li>Starting bid value: ${{ listing.starting_bid_value }} </li>
+                    {% if listing.current_bid %}
+                        <li>Current bid value: ${{ listing.current_bid.value }} </li>
+                    {% endif %}
                     <li>Users in watchlist: {{ listing.users_in_watchlist.count }} </li>
                 </ul>
             </li>
