@@ -20,8 +20,7 @@ class NewListingForm(forms.Form):
 
 def index(request):
     return render(request, "auctions/index.html", {
-        "auction_listings": AuctionListing.objects.filter(is_active=True).order_by("-timestamp"),
-        "users": User.objects.all()
+        "auction_listings": AuctionListing.objects.filter(is_active=True).order_by("-timestamp")
     })
 
 
@@ -182,3 +181,19 @@ def listing(request, id):
                 })
         except:
             print("404")
+
+def categories(request):
+    return render(request, "auctions/categories.html", {
+        "categories": Category.objects.all().order_by("name")
+    })
+
+
+def category(request, category):
+    if category != "Uncategorized":
+        return render(request, "auctions/index.html", {
+            "auction_listings": Category.objects.get(name=category).listings.all().order_by("-timestamp")
+        })
+    else:
+        return render(request, "auctions/index.html", {
+            "auction_listings": AuctionListing.objects.all().filter(category=None).order_by("-timestamp")
+        })

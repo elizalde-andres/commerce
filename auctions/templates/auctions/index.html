@@ -5,13 +5,4 @@
 
     {% include "auctions/base_list.html" %}
 
-    <ul>
-        {% for user in users %}
-            {% if user.comments %}
-                {{ user }}
-                {{ user.comments.first }}
-            {% endif %}
-        {% endfor %}
-    </ul>
-
 {% endblock %}
