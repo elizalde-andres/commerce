@@ -190,10 +190,23 @@ def categories(request):
 
 def category(request, category):
     if category != "Uncategorized":
-        return render(request, "auctions/index.html", {
-            "auction_listings": Category.objects.get(name=category).listings.all().order_by("-timestamp")
+        return render(request, "auctions/category.html", {
+            "auction_listings": Category.objects.get(name=category).listings.all().order_by("-timestamp"),
+            "category": category
         })
     else:
-        return render(request, "auctions/index.html", {
-            "auction_listings": AuctionListing.objects.all().filter(category=None).order_by("-timestamp")
+        return render(request, "auctions/category.html", {
+            "auction_listings": AuctionListing.objects.all().filter(category=None).order_by("-timestamp"),
+            "category": category
         })
+
+
+@login_required()
+def watchlist(request):
+    user = request.user
+    if user.is_authenticated:
+        return render(request, "auctions/watchlist.html", {
+            "auction_listings": user.watchlist.all().order_by("-timestamp")
+        })
+    else:
+        return HttpResponseRedirect(reverse("login"))

@@ -3,9 +3,14 @@
     {% for listing in auction_listings %}
         <li><a href="{% url 'listing' listing.pk %}">{{ listing.title }}</a>
             <ul>
-                <li>{{ listing.timestamp }} </li>
+                <li>Published: {{ listing.timestamp }} </li>
                 <li>{{ listing.description }} </li>
                 <li><img src="{{ listing.image_url }}" alt="{{ listing.title }}" width="300"></li>
+                {% if listing.category %}
+                    <li>Category: {{ listing.category }} </li>
+                {% else %}
+                    <li>Uncategorized</li>
+                {% endif %}
                 <li>Starting bid value: ${{ listing.starting_bid_value }} </li>
                 {% if listing.current_bid %}
                     <li>Current bid value: ${{ listing.current_bid.value }} </li>
