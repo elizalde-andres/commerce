@@ -1,13 +1,13 @@
-<ul>
+<ul class="listings">
     {% for listing in auction_listings %}
-        <li><a href="{% url 'listing' listing.pk %}">{{ listing.title }}</a>
+        <li class="listing-title"><a href="{% url 'listing' listing.pk %}">{{ listing.title }}</a>
             <ul>
                 <li>Published: {{ listing.timestamp }} </li>
                 <li>{{ listing.description }} </li>
                 {% if listing.image_url %}
                     <li><img src="{{ listing.image_url }}" alt="{{ listing.title }}" width="300"></li>
                 {% else %}
-                    <li><img src="static/auctions/no-image-available.jpg" alt="{{ listing.title }}" width="300"></li>
+                    <li><img src="../static/auctions/no-image-available.jpg" alt="{{ listing.title }}" width="300"></li>
                 {% endif %}
                 {% if listing.category %}
                     <li>Category: {{ listing.category }} </li>
