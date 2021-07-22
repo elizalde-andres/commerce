@@ -3,7 +3,6 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models.base import Model
 from django.db.models.fields import BooleanField, CharField, DateTimeField, DecimalField, TextField, URLField
-from django.db.models.fields.related import OneToOneField
 
 
 class User(AbstractUser):
@@ -23,7 +22,7 @@ class AuctionListing(models.Model):
     title = CharField(max_length=64)
     description = TextField()
     category = models.ForeignKey(Category, on_delete=models.PROTECT, blank=True, null=True, related_name="listings")
-    image_url = URLField(blank=True, null=True, default="../static/auctions/no-image-available.jpg")
+    image_url = URLField(blank=True, null=True)
     starting_bid_value = DecimalField(max_digits=6, decimal_places=2)
     is_active = BooleanField(default=True)
 
@@ -36,7 +35,6 @@ class AuctionListing(models.Model):
 
 
 class Bid(models.Model):
-    #TODO: ver qué pasa si elimino el usuario, quién gana la subasta
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="bids")
     value = DecimalField(max_digits=6, decimal_places=2)
     listing = models.ForeignKey(AuctionListing, on_delete=models.CASCADE, related_name="bids")

@@ -8,7 +8,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from .models import Category, User, AuctionListing, Bid, Comment
+from .models import User, Category, AuctionListing, Bid, Comment  
 
 class NewListingForm(forms.Form):
     title = forms.CharField(max_length=64, label="Title")
@@ -83,6 +83,8 @@ def create_listing(request):
             try:
                 if request.user.is_authenticated:
                     user = request.user
+
+                    # Create listing
                     listing = AuctionListing(
                         user = user, 
                         title = form.cleaned_data["title"], 
@@ -92,7 +94,8 @@ def create_listing(request):
                         )
                     image_url = form.cleaned_data["image_url"]
                     if (image_url):
-                        listing.image_url = image_url 
+                        listing.image_url = image_url
+                    # Save to database 
                     listing.save()
                     return HttpResponseRedirect(reverse("index"))
             except:
@@ -112,25 +115,37 @@ def create_listing(request):
 
 
 def listing(request, id):
+    exception = False
+    message = ""
     if request.method == "POST":
-        if True:
+        try:
             listing = AuctionListing.objects.get(pk=id)
-            if request.POST.get("bid"):
-                bid_value = float(request.POST.get("bid"))
-                if listing.current_bid:
-                    current_bid = listing.current_bid.value
-                else:
-                    current_bid = listing.starting_bid_value
-                if request.user.is_authenticated:
-                    user = request.user
+            if request.user.is_authenticated:
+                user = request.user
+
+                # Check which action was taken in listing page
+                # Update bid
+                if request.POST.get("bid"):
+                    try:
+                        bid_value = float(request.POST.get("bid"))
+                    except ValueError:
+                        return render(request, "auctions/listing.html", {
+                            "message": "You can't place a bid on your own listing",
+                            "listing": listing
+                        })
+                    if listing.current_bid:
+                        current_bid = listing.current_bid.value
+                    else:
+                        current_bid = listing.starting_bid_value
+
                     if listing.user == user:
                         return render(request, "auctions/listing.html", {
                             "message": "You can't place a bid on your own listing",
                             "listing": listing
                         })
-                    elif bid_value <= current_bid:
+                    elif bid_value <= current_bid or bid_value > 999999:
                         return render(request, "auctions/listing.html", {
-                            "message": f"The bid must be greater than { current_bid }",
+                            "message": f"The bid must be greater than { current_bid } and smaller than 1 million",
                             "listing": listing
                         })
                     else: 
@@ -138,11 +153,13 @@ def listing(request, id):
                                 value = bid_value, 
                                 listing = listing)
                         bid.save()
-                else: print("No estas logueado")
-            print(request.POST)
-            if request.user.is_authenticated:
-                user = request.user
-                if request.POST.get("watchlist"):
+                        return render(request, "auctions/listing.html", {
+                            "message": "Your bid was successful.",
+                            "listing": listing
+                        })   
+
+                # Add/Remove listing from watchlist
+                elif request.POST.get("watchlist"):
                     watchlist = user.watchlist.filter(pk=id)
                     if watchlist:
                         user.watchlist.remove(listing)
@@ -151,6 +168,8 @@ def listing(request, id):
                     return render(request, "auctions/listing.html", {
                         "listing": listing
                     })
+
+                # Close auction 
                 elif request.POST.get("close"):
                     listing.is_active = False
                     listing.save()
@@ -158,6 +177,8 @@ def listing(request, id):
                             "message": "Your auction was closed successfuly...",
                             "listing": listing
                         })
+
+                # Add a comment
                 elif request.POST.get("comment"):
                     comment = Comment(user = user,
                                 comment = request.POST.get("comment"),
@@ -166,21 +187,22 @@ def listing(request, id):
                     return render(request, "auctions/listing.html", {
                             "listing": listing
                         })
-            else: 
-                return render(request, "auctions/listing.html", {
-                        "message": "Your bid was successful...",
-                        "listing": listing
-                    })
-        else:
-            print(" FIN EXCEPTERRORRR")
-    else:
+            else:
+                return HttpResponseRedirect(reverse("login"))
+        except:
+            exception = True
+            message = "Sorry. Something went wrong while processing your request."
+    if (request.method == "GET" or exception):
         try:
             listing = AuctionListing.objects.get(pk=id)
             return render(request, "auctions/listing.html", {
-                    "listing": listing
-                })
+                        "listing": listing,
+                        "message": message
+            })
         except:
-            print("404")
+            return render(request, "auctions/404.html", {
+                    "message": "The listing you are trying to reach does not exist."
+                })
 
 def categories(request):
     return render(request, "auctions/categories.html", {
@@ -189,16 +211,22 @@ def categories(request):
 
 
 def category(request, category):
-    if category != "Uncategorized":
-        return render(request, "auctions/category.html", {
-            "auction_listings": Category.objects.get(name=category).listings.all().order_by("-timestamp"),
-            "category": category
-        })
-    else:
-        return render(request, "auctions/category.html", {
-            "auction_listings": AuctionListing.objects.all().filter(category=None).order_by("-timestamp"),
-            "category": category
-        })
+    try:
+        if category != "Uncategorized":
+            return render(request, "auctions/category.html", {
+                "auction_listings": Category.objects.get(name=category).listings.all().order_by("-timestamp"),
+                "category": category
+            })
+        else:
+            return render(request, "auctions/category.html", {
+                "auction_listings": AuctionListing.objects.all().filter(category=None).order_by("-timestamp"),
+                "category": category
+            })
+    except:
+        return render(request, "auctions/404.html", {
+                    "message": "The category you are trying to reach does not exist."
+                })
+
 
 
 @login_required()
