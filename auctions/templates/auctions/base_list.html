@@ -1,26 +1,35 @@
-<ul class="listings">
-    {% for listing in auction_listings %}
-        <li class="listing-title"><a href="{% url 'listing' listing.pk %}">{{ listing.title }}</a>
-            <ul>
-                <li>Published: {{ listing.timestamp }} </li>
-                <li>{{ listing.description }} </li>
-                {% if listing.image_url %}
-                    <li><img src="{{ listing.image_url }}" alt="{{ listing.title }}" width="300"></li>
-                {% else %}
-                    <li><img src="../static/auctions/no-image-available.jpg" alt="{{ listing.title }}" width="300"></li>
-                {% endif %}
-                {% if listing.category %}
-                    <li>Category: {{ listing.category }} </li>
-                {% else %}
-                    <li>Uncategorized</li>
-                {% endif %}
-                <li>Starting bid value: ${{ listing.starting_bid_value }} </li>
-                {% if listing.current_bid %}
-                    <li>Current bid value: ${{ listing.current_bid.value }} </li>
-                {% endif %}
-                <li>Users in watchlist: {{ listing.users_in_watchlist.count }} </li>
-            </ul>
-        </li>
+<div class="container">
+    <div class="row">
+      <div class="col">
+        Column
+      </div>
+      <div class="col">
+        Column
+      </div>
+      <div class="col">
+        Column
+      </div>
+    </div>
+</div>
 
+
+<div class="container">
+    {% for listing in auction_listings %}
+        <div class="row"><a href="{% url 'listing' listing.pk %}">{{ listing.title }}</a></div>
+        <div class="row">
+            <div class="col">
+                {% if listing.image_url %}
+                    <img src="{{ listing.image_url }}" alt="{{ listing.title }}" width="300">
+                {% else %}
+                    <img src="../static/auctions/no-image-available.jpg" alt="{{ listing.title }}" width="300">
+                {% endif %}
+            </div>
+            <div class="col">
+                <div class="row">Published: {{ listing.timestamp }}</div>
+                <div class="row"><span>{{ listing.description }}</span></div>
+            </div>
+        </div>
     {% endfor %}
-</ul>
+</div>
+
+
