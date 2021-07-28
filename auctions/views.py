@@ -122,7 +122,7 @@ def listing(request, id):
             listing = AuctionListing.objects.get(pk=id)
             if request.user.is_authenticated:
                 user = request.user
-
+                
                 # Check which action was taken in listing page
                 # Update bid
                 if request.POST.get("bid"):
@@ -130,7 +130,7 @@ def listing(request, id):
                         bid_value = float(request.POST.get("bid"))
                     except ValueError:
                         return render(request, "auctions/listing.html", {
-                            "message": "You can't place a bid on your own listing",
+                            "message": "Your bid must be a number.",
                             "listing": listing
                         })
                     if listing.current_bid:
@@ -184,6 +184,10 @@ def listing(request, id):
                                 comment = request.POST.get("comment"),
                                 listing = listing)
                     comment.save()
+                    return render(request, "auctions/listing.html", {
+                            "listing": listing
+                        })
+                else:
                     return render(request, "auctions/listing.html", {
                             "listing": listing
                         })

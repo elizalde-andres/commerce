@@ -1,0 +1,77 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h2>{{ listing.title }}</h2>
+    {% if message %}
+        <div>{{ message }}</div>
+    {% endif %}
+        <ul>
+            <li>{{ listing.title }}
+                <ul>
+                    <li>{{ listing.timestamp }} </li>
+                    <li>{{ listing.description }} </li>
+                    {% if listing.image_url %}
+                        <li><img src="{{ listing.image_url }}" alt="{{ listing.title }}" width="300"></li>
+                    {% else %}
+                        <li><img src="../static/auctions/no-image-available.jpg"  alt="{{ listing.title }}" width="300"></li>
+                    {% endif %}                    
+                    <li>Starting bid value: ${{ listing.starting_bid_value }} </li>
+                    {% if listing.current_bid %}
+                        <li>Current bid value: ${{ listing.current_bid.value }} </li>
+                    {% endif %}
+                    <li>Users in watchlist: {{ listing.users_in_watchlist.count }} </li>
+                </ul>
+            </li>
+        </ul>
+        {% if user.is_authenticated %}
+            <form action="{% url 'listing' listing.pk %}" method="POST">
+                {% csrf_token %}
+                {% if listing.is_active %}
+                    <div class="form-group">
+                        <input class="form-control" type="text" name="bid" placeholder="Place your bid">
+                    </div>
+                    <input class="btn btn-primary" type="submit" value="Bid!">
+                    
+                    {% if user not in listing.users_in_watchlist.all %}
+                        <button id="watchlist-button" name="watchlist" value="True" style="background-color: transparent; border: none;" type="submit"><i id="eye-slash" style="color:red;" class="fa fa-eye-slash"></i></button> 
+                    {% else %}
+                        <button id="watchlist-button"  name="watchlist" value="False" style="background-color: transparent; border: none;" type="submit"><i id="eye" style="color:green;" class="fa fa-eye"></i></button>
+                    {% endif %}
+                
+                    {% if user == listing.user %}
+                        <input class="btn btn-primary" name="close" type="submit" value="Close auction">
+                    {% endif %}
+                {% else %}
+                    {% if user == listing.user %}
+                        {% if listing.current_bid %}
+                            User <strong>{{ listing.current_bid.user }}</strong> won this auction. You can contact him by email: {{ listing.current_bid.user.email }}
+                        {% else %}
+                            Nobody bid on this item.
+                        {% endif %}
+                    {% elif user == listing.current_bid.user %}
+                        You won the auction.
+                    {% else %}
+                        This bid is closed. 
+                    {% endif %}
+                {% endif %}
+            </form>
+        {% else %}
+            Log in to bid on this listing, comment or add it to your watchlist.
+        {% endif %}
+        
+    <ul>
+        {% for comment in listing.comments.all|dictsort:'timestamp' reversed %}
+            <li>[{{ comment.user }}] at {{ comment.timestamp }}: {{ comment.comment }}</li>
+        {% endfor %}
+    </ul>
+    {% if user.is_authenticated and listing.is_active%}
+        <form action="{% url 'listing' listing.pk %}" method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <input class="form-control" type="textarea" name="comment" placeholder="Write your comment">
+            </div>
+            <input class="btn btn-primary" type="submit" value="Add comment">
+        </form>
+    {% endif %}
+
+{% endblock %}

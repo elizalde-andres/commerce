@@ -1,7 +1,11 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-    <h2>Listings in my watchlist:</h2>
+    {% if auction_listings.all %}
+        <h2>Listings in my watchlist:</h2>
+    {% else %}
+        <h2>Your watchlist is empty.</h2>
+    {% endif %}
 
     {% include "auctions/base_list.html" %}
 
