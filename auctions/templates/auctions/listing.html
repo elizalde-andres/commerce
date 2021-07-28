@@ -29,9 +29,9 @@
 	<div class="row">
 		<div class="col-md-4">
 			<div class="row">
-				<div class="col-md-12">
+				<div class="col-md-12 text-center">
 					{% if listing.image_url %}
-                        <img src="{{ listing.image_url }}" alt="{{ listing.title }}" width="300">
+                        <img src="{{ listing.image_url }}" alt="{{ listing.title }}" style="max-height:300px;max-width:300px;height:auto;width:auto;">
                     {% else %}
                         <img src="../static/auctions/no-image-available.jpg"  alt="{{ listing.title }}" width="300">
                     {% endif %}
@@ -62,7 +62,7 @@
 			</div>
 		</div>
 		<div class="col-md-8 lead">
-			{{ listing.description }}
+			{{ listing.description|linebreaks }}
 		</div>
 	</div>
 	<div class="row">
