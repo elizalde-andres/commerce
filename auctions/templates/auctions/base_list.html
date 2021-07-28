@@ -1,35 +1,65 @@
 <div class="container">
-    <div class="row">
-      <div class="col">
-        Column
-      </div>
-      <div class="col">
-        Column
-      </div>
-      <div class="col">
-        Column
-      </div>
-    </div>
-</div>
-
-
-<div class="container">
     {% for listing in auction_listings %}
-        <div class="row"><a href="{% url 'listing' listing.pk %}">{{ listing.title }}</a></div>
-        <div class="row">
-            <div class="col">
-                {% if listing.image_url %}
-                    <img src="{{ listing.image_url }}" alt="{{ listing.title }}" width="300">
-                {% else %}
-                    <img src="../static/auctions/no-image-available.jpg" alt="{{ listing.title }}" width="300">
-                {% endif %}
-            </div>
-            <div class="col">
-                <div class="row">Published: {{ listing.timestamp }}</div>
-                <div class="row"><span>{{ listing.description }}</span></div>
+        <div class="row border border-info mb-4 p-3">
+            <div class="col-md-12">
+                <div class="row align-items-center h-100">
+                    <div class="col-md-4">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <a href="{% url 'listing' listing.pk %}">
+                                    {% if listing.image_url %}
+                                        <img src="{{ listing.image_url }}" alt="{{ listing.title }}" width="300" class="figure-img img-fluid rounded">
+                                    {% else %}
+                                        <img src="../static/auctions/no-image-available.jpg" alt="{{ listing.title }}" width="300" class="figure-img img-fluid rounded">
+                                    {% endif %}
+                                </a>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <figcaption class="figure-caption text-right">
+                                    {% if listing.category %}
+                                    Category: <a href="{% url 'category' listing.category %}">{{ listing.category }}</a>
+                                    {% else %}
+                                    <a href="{% url 'category' 'Uncategorized' %}">Uncategorized</a>
+                                    {% endif %}
+                                </figcaption>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-8 align-self-start h-100">
+                        <div class="row h-100">
+                            <div class="col-md-8">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <h3>
+                                            <a href="{% url 'listing' listing.pk %}" class="text-info">{{ listing.title }}</a>
+                                        </h3>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12 text-right">
+                                        <span class="text-muted text-right">Published: {{ listing.timestamp.year }}-{{ listing.timestamp.month }}-{{ listing.timestamp.day }} at {{ listing.timestamp.time }}</span>
+                                    </div>
+                                </div>
+                                <div class="row mt-3">
+                                    <div class="col-md-12">
+                                        <span>{{ listing.description }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 align-self-center text-center">
+                                {% if listing.current_bid %}
+                                    <p class="text-muted">Starting bid: ${{ listing.starting_bid_value }}</p>
+                                    <span>Current bid value: <h3 class="text-success">${{ listing.current_bid.value }}</h3></span>
+                                {% else %}
+                                    <span class="text-muted">Starting bid: <h3 class="text-success">${{ listing.starting_bid_value }}</h3></span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     {% endfor %}
 </div>
-
-
